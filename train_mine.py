@@ -18,7 +18,7 @@ from model_mine import embed_net
 from model_agw import embed_net as agw
 
 from utils import *
-from loss import OriTripletLoss,  CenterTripletLoss, CrossEntropyLabelSmooth, TripletLoss_WRT, MMD_Loss, MarginMMD_Loss, CMD_loss
+from loss import OriTripletLoss,  CenterTripletLoss, CrossEntropyLabelSmooth, TripletLoss_WRT, MMD_Loss, MarginMMD_Loss
 from tensorboardX import SummaryWriter
 from re_rank import random_walk, k_reciprocal
 

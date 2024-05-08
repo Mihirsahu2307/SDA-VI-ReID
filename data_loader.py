@@ -64,7 +64,7 @@ class SYSUData_DA(data.Dataset):
         else:
             indices = np.random.choice(len_tot, num_ids, replace=False)
         
-        print(indices)
+        # print(indices)
         indices = set(indices)
         # indices = set(range(num_ids))
         
@@ -80,7 +80,7 @@ class SYSUData_DA(data.Dataset):
                 train_thermal_image.append(train_thermal_image_og[i])
                 train_thermal_label.append(label_mapping[train_thermal_label_og[i]])
                 
-        print("Loop Done!!\n")
+        # print("Loop Done!!\n")
         
         # BGR to RGB
         self.train_color_image   = np.array(train_color_image)
@@ -91,9 +91,9 @@ class SYSUData_DA(data.Dataset):
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
         
-        print("Loading Done!!\n")
-        print("Total Color images chosen: " + str(len(train_color_image)))
-        print("Total Thermal images chosen: " + str(len(train_thermal_image)))
+        print("SYSU Loading Done!!\n")
+        # print("Total Color images chosen: " + str(len(train_color_image)))
+        # print("Total Thermal images chosen: " + str(len(train_thermal_image)))
         
 
     def __getitem__(self, index):

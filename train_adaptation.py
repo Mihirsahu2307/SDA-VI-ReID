@@ -18,7 +18,7 @@ from model_mine import embed_net
 from model_agw import embed_net as agw
 
 from utils import *
-from loss import OriTripletLoss,  CenterTripletLoss, CrossEntropyLabelSmooth, TripletLoss_WRT, MMD_Loss, MarginMMD_Loss, CMD_loss
+from loss import OriTripletLoss,  CenterTripletLoss, CrossEntropyLabelSmooth, TripletLoss_WRT, MMD_Loss, MarginMMD_Loss
 from tensorboardX import SummaryWriter
 from re_rank import random_walk, k_reciprocal
 
@@ -100,7 +100,7 @@ parser.add_argument('--source_model_path', default='', type=str,
 parser.add_argument('--source_weight', default=0.25, type=float,
                     help='Weight of source loss during adaptation')
 parser.add_argument('--hdmmd_weight', default=1, type=float,
-                    help='Weight of DMMD loss during adaptation')
+                    help='Weight of HDMMD loss during adaptation')
 
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
@@ -322,7 +322,6 @@ criterion_tri.to(device)
 
 criterion_mmd = MMD_Loss().to(device)
 criterion_margin_mmd = MarginMMD_Loss(margin=args.margin_mmd, P=args.batch_size, K=args.num_pos).to(device)
-criterion_cmd = CMD_loss(P=args.batch_size, K=args.num_pos).to(device)
 # criterion_dmmd = DMMD(P=args.batch_size, K=args.num_pos).to(device)
 criterion_hdmmd = HDMMD(P=args.batch_size, K=args.num_pos).to(device)
 
@@ -484,20 +483,16 @@ def train(epoch, weight_hdmmd = args.hdmmd_weight, weight_source = args.source_w
                 ## Apply Margin MMD-ID Loss on Pooling Layer
                 source_loss_dist, _, _ = criterion_margin_mmd(source_rgb_feat, source_ir_feat) ## Use MMD-ID
                 target_loss_dist, _, _ = criterion_margin_mmd(target_rgb_feat, target_ir_feat) ## Use MMD-ID
-
-            elif args.dist_disc == 'cmd':
-                source_loss_dist = criterion_cmd(source_rgb_feat, source_ir_feat) ## Use CMD
-                target_loss_dist = criterion_cmd(target_rgb_feat, target_ir_feat) ## Use CMD
                 
             if args.dist_disc is not None:
                 source_loss = source_loss + source_loss_dist * args.dist_w ## Add Discrepancy Loss
                 target_loss = target_loss + target_loss_dist * args.dist_w ## Add Discrepancy Loss
 
             # Direct DMMD loss
-            # hdmmd_loss = sum(criterion_dmmd(source_feat, target_feat)) / 3 ## Use DMMD mean
+            # hdmmd_loss = sum(criterion_dmmd(source_feat, target_feat)) / 3
             
             # HDMMD loss
-            hdmmd_loss = criterion_hdmmd(source_rgb_feat, source_ir_feat, target_rgb_feat, target_ir_feat) ## Use DMMD mean
+            hdmmd_loss = criterion_hdmmd(source_rgb_feat, source_ir_feat, target_rgb_feat, target_ir_feat)
             # hdmmd_loss = 0
 
         
@@ -532,7 +527,7 @@ def train(epoch, weight_hdmmd = args.hdmmd_weight, weight_source = args.source_w
                   'totLoss: {train_loss.val:.4f} ({train_loss.avg:.4f}) '
                   'tarLoss: {target_train_loss.val:.4f} ({target_train_loss.avg:.4f}) '
                   'soLoss: {source_train_loss.val:.4f} ({source_train_loss.avg:.4f}) '
-                  'hdmmd: {dmmd:.4f} '
+                  'hdmmd: {hdmmd:.4f} '
                   'tarIDLoss: {id_loss.val:.4f} ({id_loss.avg:.4f}) '
                   'tarTriLoss: {tri_loss.val:.4f} ({tri_loss.avg:.4f}) '
                   'tarAccu: {:.2f} '
@@ -767,4 +762,3 @@ for wd in weights:
             print('Best Epoch [{}], Rank-1: {:.2%} |  mAP: {:.2%}| mINP: {:.2%}'.format(best_epoch, best_acc, best_mAP, best_mINP))
             
     print('~~~ For weight {} ~~~\n\nBest Epoch [{}], Rank-1: {:.2%}'.format(wd, weight_best_epoch, weight_best_r1))
-    
