@@ -7,34 +7,15 @@
 
 This repository contains the PyTorch implementation of SDA-VI-ReID, a novel approach to Visible-Infrared Person Re-Identification (VI-ReID). Our method addresses the challenging problem of matching individuals across visible and infrared image modalities.
 
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/SDA-VI-ReID.git
-cd SDA-VI-ReID
-
-# Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
 ## Training and Testing
 
-Sample scripts are provided in `run.sh`. To change the number of target IDs, modify the `--target_ids` argument:
+Sample scripts for training and testing across various datasets are provided in `run.sh`. 
+
+To change the number of target IDs, modify the `--target_ids` argument:
 
 ```bash
-# Example training command
 python train.py --target_ids 10
 ```
-
-### Key Parameters
-
-- `--target_ids`: Number of target identities to use in training
-- Additional parameters can be found in the configuration files
 
 ## Acknowledgments
 
